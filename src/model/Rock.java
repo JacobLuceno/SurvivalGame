@@ -1,7 +1,8 @@
 package model;
 
 public class Rock extends StationaryObject {
-    Rock(Vector2 pos){
 
+    public Rock(Vector2 position){
+        super(position, false);
     }
 }

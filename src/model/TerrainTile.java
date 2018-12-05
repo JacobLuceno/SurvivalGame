@@ -41,6 +41,7 @@ public class TerrainTile extends  GameObject {
             case 0:
             case 1:
                 statObjType = StatObjType.BUSH;
+                statObj = new Bush(super.getPosition());
                 break;
             case 3:
             case 4:
@@ -67,17 +68,19 @@ public class TerrainTile extends  GameObject {
     }
     private void desertSetup(){
         Random rand = new Random();
-        int statObj =rand.nextInt(30);
+        int statObjInt =rand.nextInt(30);
         hasStatObj = false;
-        switch (statObj){
+        switch (statObjInt){
             case 0:
                 hasStatObj = true;
                 statObjType = StatObjType.BUSH;
+                statObj = new Bush(super.getPosition());
                 break;
             case 1:
             case 2:
                 hasStatObj = true;
                 statObjType = StatObjType.ROCK;
+                statObj = new Rock(super.getPosition());
                 break;
         }
     }
