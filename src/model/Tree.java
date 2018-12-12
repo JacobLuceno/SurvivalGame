@@ -29,6 +29,11 @@ public class Tree extends StationaryObject {
             numberSticks = 0;
             return returnVal;
     }
+    @Override
+    public void interact(Player player){
+        player.gatherSticks(harvestSticks());
+        System.out.println(player.getSticks());
+    }
 
     //Getters
     public boolean getHasSticks() {

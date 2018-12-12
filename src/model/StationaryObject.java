@@ -1,6 +1,6 @@
 package model;
 
-abstract class StationaryObject extends GameObject{
+abstract class StationaryObject extends GameObject implements Interactable{
     private boolean passable;
 
     StationaryObject(){

@@ -14,7 +14,7 @@ public class Main extends Application{
 
     @Override
     public void start(Stage primaryStage) {
-        Game game = new Game(100,100);
+        Game game = new Game();
         ViewManager vm = new ViewManager(game);
         ControlManager cm = new ControlManager(vm.getScene(), game);
         primaryStage = vm.getStage();
