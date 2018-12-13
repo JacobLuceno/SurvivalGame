@@ -18,6 +18,11 @@ public class Bush extends  StationaryObject{
         hasBerries = true;
     }
 
+    @Override
+    public void interact(Player player){
+        numberOfBerries = 0;
+    }
+
     public int getNumberOfBerries(){
         return numberOfBerries;
     }
@@ -25,6 +30,7 @@ public class Bush extends  StationaryObject{
     public boolean getHasBerries(){
         return hasBerries;
     }
+
 
     public int gatherBerries(){
         hasBerries = false;
