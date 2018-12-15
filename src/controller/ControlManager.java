@@ -21,7 +21,6 @@ public class ControlManager {
     private boolean leftKeyDown;
     private boolean upKeyDown;
     private boolean downKeyDown;
-    private boolean interactKeyDown;
 
     private AnimationTimer animationTimer;
 
@@ -120,6 +119,11 @@ public class ControlManager {
             if (!game.getPlayer().isAlive()){
                 game.setGameOver(true);
                 game.setGameWon(false);
+            } else{
+                if (game.getDay() == 2){
+                    game.setGameWon(true);
+                    game.setGameOver(true);
+                }
             }
         }
         if (Game.isInCombat()){
@@ -216,9 +220,6 @@ public class ControlManager {
         this.upKeyDown = upKeyDown;
     }
 
-    public void setInteractKeyDown(boolean interactKeyDown) {
-        this.interactKeyDown = interactKeyDown;
-    }
 
 
 }

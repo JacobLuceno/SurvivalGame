@@ -106,10 +106,10 @@ public class Player extends MobileObject{
             if (t.getPosition().getv0() == a.getPosition().getv0() && t.getPosition().getv1() == a.getPosition().getv1()
                 || t.getPosition().getv0() == a.getPriorLoc().getv0() && t.getPosition().getv1() == a.getPriorLoc().getv1()){
                 a.interact(this);
-                game.setAnimalTaggedForRemoval(true);
                 break;
             }
         }
+
         if (Game.getCurrentEncounter() == null) {
             setPriorLoc(new Vector2(getPosition().getv0(), getPosition().getv1()));
             if (t.getHasStatObj()) {

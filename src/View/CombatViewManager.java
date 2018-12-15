@@ -102,7 +102,7 @@ public class CombatViewManager {
                     Game.setCurrentEncounter(null);
                     animationTimer.stop();
                 }
-                if (!combatEncounter.isMessageToDisplay()) {
+                if (!combatEncounter.isMessageToDisplay() && !combatEncounter.isEncounterOver()) {
                     combatEncounter.combatTurn();
                 }
                 else {

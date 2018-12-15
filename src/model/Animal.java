@@ -40,7 +40,7 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
         pathfinder = new AStarPathFinding(getGame(), new boolean[]{canWalkGrass, canWalkDesert, canWalkWater});
     }
 
-    public void chooseNewPosition() {
+    protected void chooseNewPosition() {
         Game game = getGame();
         TerrainTile[][] tMap = game.getMap().getTerrainMap();
         boolean pathChosen = false;
@@ -71,23 +71,23 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
         } while (!pathChosen);
     }
     public void wander(){
+        if (getPosition().getv1() == getGame().getPlayer().getPosition().getv1() && getPosition().getv0() == getGame().getPlayer().getPosition().getv0()){
+            this.interact(getGame().getPlayer());
+        }
         if (pathCompleted){
             chooseNewPosition();
             currentPath = pathfinder.findPath(getPosition(), targetPos);
             pathCompleted = false;
             pathIndex = 0;
-            System.out.println("Path has been chosen");
         }
         if (getPosition().getv0() != currentPath.get(currentPath.size() - 1).getv0() || getPosition().getv1() != currentPath.get(currentPath.size() - 1).getv1()){
-            System.out.println("Wander is being called and path is iterating");
             pathIndex++;
             setPriorLoc(getPosition());
             setPosition(currentPath.get(pathIndex));
             setBusy(true);
         } else{
-                System.out.println("Path has been completed");
-                currentPath.clear();
-                pathCompleted = true;
+            currentPath.clear();
+            pathCompleted = true;
         }
     }
 
@@ -145,4 +145,17 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
             }
         }
 
+
+
+    public boolean isCanWalkGrass() {
+        return canWalkGrass;
+    }
+
+    public boolean isCanWalkDesert() {
+        return canWalkDesert;
+    }
+
+    public boolean isCanWalkWater() {
+        return canWalkWater;
+    }
 }

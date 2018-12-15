@@ -96,19 +96,20 @@ public class GameViewManager {
                         spawnNewAnimal();
                         curAnimalListSize++;
                     }
-                    if (game.isAnimalTaggedForRemoval()) {
-                        for (AnimalImageView animalImage : animalImages){
-                            if (animalImage.getAnimal().isRemove()) {
-                                game.getAnimals().remove(animalImage.getAnimal());
-                                animalPane.getChildren().remove(animalImage);
-                                curAnimalListSize--;
-                                animalImages.remove(animalImage);
-                                break;
-                            }
+                }
+                if (game.isAnimalTaggedForRemoval()) {
+                    for (AnimalImageView animalImage : animalImages){
+                        if (animalImage.getAnimal().isRemove()) {
+                            game.getAnimals().remove(animalImage.getAnimal());
+                            animalPane.getChildren().remove(animalImage);
+                            curAnimalListSize--;
+                            animalImages.remove(animalImage);
+                            System.out.println("Animal Image Removed");
+                            break;
                         }
-                        System.out.println("Number of Animal Images is " + Integer.toString(curAnimalListSize));
-                        game.setAnimalTaggedForRemoval(false);
                     }
+                    System.out.println("Number of Animal Images is " + Integer.toString(curAnimalListSize));
+                    game.setAnimalTaggedForRemoval(false);
                 }
             }
         };

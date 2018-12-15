@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Game {
+
     public enum Direction {RIGHT, LEFT, UP, DOWN}
 
+    private final static int MAX_ANIMALS = 5;
     private final static int HEIGHT = 100;
     private final static int WIDTH = 100;
-    private final int STEPS_PER_CYCLE = 50;
+    private final static int STEPS_PER_CYCLE = 100;
+    private final static int DAYS_TO_SURVIVE = 2;
 
     private static CombatEncounter currentEncounter;
 
@@ -20,6 +23,8 @@ public class Game {
     private boolean gameWon;
     private boolean gameOver;
     private boolean animalTaggedForRemoval;
+
+
     private int day;
 
     private HerbivoreFactory herbFact;
@@ -76,18 +81,20 @@ public class Game {
     }
 
     public void checkForEncounter() {
-        if (!(player.getPriorLoc().getv0() == player.getPosition().getv0() && player.getPriorLoc().getv1() == player.getPosition().getv1())) {
-            Random rand = new Random();
-            int encounter = rand.nextInt(40);
-            switch(encounter){
-                case 0:
-                    spawnNewHerbivore();
-                    break;
-                case 1:
-                    spawnNewCarnivore();
-                    break;
-                default:
-                    //nothing spawned
+        if (animals.size() <= MAX_ANIMALS) {
+            if (!(player.getPriorLoc().getv0() == player.getPosition().getv0() && player.getPriorLoc().getv1() == player.getPosition().getv1())) {
+                Random rand = new Random();
+                int encounter = rand.nextInt(40);
+                switch (encounter) {
+                    case 0:
+                        spawnNewHerbivore();
+                        break;
+                    case 1:
+                        spawnNewCarnivore();
+                        break;
+                    default:
+                        //nothing spawned
+                }
             }
         }
     }
@@ -241,4 +248,13 @@ public class Game {
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }
+
+    public int getDay() {
+        return day;
+    }
+
+    public static int getDaysToSurvive() {
+        return DAYS_TO_SURVIVE;
+    }
+
 }

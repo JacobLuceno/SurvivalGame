@@ -24,10 +24,11 @@ public class Carnivore extends Animal {
     }
 
     @Override
-    public void chooseNewPosition(){
+    protected void chooseNewPosition(){
         Game game = getGame();
         Player player = game.getPlayer();
-        if (scanForPlayer(player)){
+        TerrainTile.TerrainType terrain = game.getMap().getTerrainMap()[(int)player.getPosition().getv0()][(int)player.getPosition().getv1()].getTerrainType();
+        if (scanForPlayer(player, terrain)){
             targetPos = player.getPosition();
         }
         else {
@@ -35,12 +36,25 @@ public class Carnivore extends Animal {
         }
     }
 
-    private boolean scanForPlayer(Player player){
-        if (getPosition().distance(player.getPosition()) <= VIEW_DISTANCE && !player.isHidden()){
+    private boolean scanForPlayer(Player player, TerrainTile.TerrainType terrain){
+        if (getPosition().distance(player.getPosition()) <= VIEW_DISTANCE && !player.isHidden() && canWalk(terrain)){
             return true;
         }
         else {
             return false;
+        }
+    }
+
+    private boolean canWalk(TerrainTile.TerrainType terrain){
+        switch (terrain){
+            case WATER:
+                return isCanWalkWater();
+            case GRASSLAND:
+                return isCanWalkGrass();
+            case DESERT:
+                return isCanWalkDesert();
+            default:
+                return false;
         }
     }
 

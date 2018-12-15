@@ -130,7 +130,6 @@ public class AStarPathFinding {
                     temp = temp.getPrevious();
                 }
 
-                System.out.println("Target found. DONE!");
                 Collections.reverse(path);
                 break;
             }

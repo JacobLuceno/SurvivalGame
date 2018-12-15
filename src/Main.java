@@ -1,11 +1,11 @@
 
 //TODO HANDLE KNOWN ISSUES
-//  Animals can spawn outside of bounds of game and cannot be interacted with
 //  Player can be pushed outside bounds of game when fleeing if base is near edge
 //  Buttons in general need to be prettied up
-//  Jose's implementation of A* may be changing terrtainTiles in nonsucustainable way
 //  Static occurrences in Game and TerrainTile, which may be better off passed as parameters
-//sometimes the base doesn't spawn and crashes game, or two bases spawn
+//  sometimes game crashes when new animal is spawned. no exceptions or errors thrown.  Not sure how to tackle this one
+//  music player crashes on startup fairly often
+
 
 import View.MusicManager;
 import View.ViewManager;

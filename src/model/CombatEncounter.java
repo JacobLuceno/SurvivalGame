@@ -22,6 +22,11 @@ public class CombatEncounter {
 
 
     CombatEncounter(Player player, Animal animal){
+
+
+        System.out.println("Animal Tagged for removal.");
+        player.getGame().setAnimalTaggedForRemoval(true);
+        animal.setRemove(true);
         this.player = player;
         this.animal = animal;
         playersTurn = false;
@@ -53,10 +58,9 @@ public class CombatEncounter {
     public void combatTurn(){
         if (!player.isAlive() || !animal.isAlive() || player.isFled() || animal.isFled()){
             encounterOver = true;
-            animal.setRemove(true);
         }
         if(!encounterOver) {
-            if (animalsTurn && animal.isAlive()) {
+            if (animalsTurn && animal.isAlive() && !animal.isFled()) {
                 if(animal.combatLogic(player)) {
                     if (animal instanceof Carnivore) {
                         message = "The animal attacks viciously!\n It bites you!";
