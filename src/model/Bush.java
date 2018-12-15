@@ -5,17 +5,16 @@ public class Bush extends  StationaryObject{
     int numberOfBerries;
     boolean hasBerries;
 
-    public Bush(){
-        super(true);
+
+    public Bush( Vector2 position, Game game){
+        super(position, game, true);
         numberOfBerries = 1;
         hasBerries = true;
-
     }
 
-    public Bush( Vector2 position){
-        super(position, true);
-        numberOfBerries = 1;
-        hasBerries = true;
+    @Override
+    public void interact(Player player){
+        numberOfBerries = 0;
     }
 
     public int getNumberOfBerries(){
@@ -25,6 +24,7 @@ public class Bush extends  StationaryObject{
     public boolean getHasBerries(){
         return hasBerries;
     }
+
 
     public int gatherBerries(){
         hasBerries = false;

@@ -6,26 +6,36 @@ public abstract class MobileObject extends GameObject {
     private int currentHitPoints;
     private boolean alive;
     private boolean busy;
+    private boolean fled;
+    private Vector2 priorLoc;
+    private Game.Direction facing;
 
-    public MobileObject(Vector2 pos, int speed, int maxHitPoints){
-        super(pos);
+
+    private boolean turnOver;
+
+    public MobileObject(Vector2 pos, Game game, int speed, int maxHitPoints){
+        super(pos, game);
+        priorLoc = new Vector2(getPosition().getv0(), getPosition().getv1());
         this.SPEED = speed;
         this.MAX_HIT_POINTS = maxHitPoints;
         this.currentHitPoints = maxHitPoints;
         alive = true;
         busy = false;
+        turnOver = false;
     }
 
+    abstract public boolean flee();
+    abstract public boolean attack(MobileObject target);
     public void sufferHarm(int harm){
         this.setCurrentHitPoints(this.getCurrentHitPoints() - harm);
         if (this.getCurrentHitPoints() <= 0){
             this.setAlive(false);
         }
     }
-    public void move(Game.Direction direction, int maxX, int maxY){
+    public void move(Game.Direction direction){
         switch(direction){
             case RIGHT:
-                if (this.getPosition().getv1() < maxX - 1) {
+                if (this.getPosition().getv1() < Game.getWIDTH()- 1) {
                     this.setPosition(new Vector2(this.getPosition().getv0(), this.getPosition().getv1() + 1));
                 }
                 break;
@@ -35,7 +45,7 @@ public abstract class MobileObject extends GameObject {
                 }
                 break;
             case DOWN:
-                if (this.getPosition().getv0() < maxY - 1) {
+                if (this.getPosition().getv0() < Game.getHEIGHT() - 1) {
                     this.setPosition(new Vector2(this.getPosition().getv0() + 1, this.getPosition().getv1()));
                 }
                 break;
@@ -47,7 +57,7 @@ public abstract class MobileObject extends GameObject {
         }
     }
 
-    //Getters and setters
+    //GETTERS AND SETTERS
 
     public int getMAX_HIT_POINTS() {
         return MAX_HIT_POINTS;
@@ -72,5 +82,29 @@ public abstract class MobileObject extends GameObject {
     }
     public void setBusy(boolean busy) {
         this.busy = busy;
+    }
+    public Game.Direction getFacing() {
+        return facing;
+    }
+    public void setFacing(Game.Direction facing) {
+        this.facing = facing;
+    }
+    public boolean isFled() {
+        return fled;
+    }
+    public void setFled(boolean fled){
+        this.fled = fled;
+    }
+    public Vector2 getPriorLoc() {
+        return priorLoc;
+    }
+    public void setPriorLoc(Vector2 priorLoc) {
+        this.priorLoc = priorLoc;
+    }
+    public boolean isTurnOver() {
+        return turnOver;
+    }
+    public void setTurnOver(boolean turnOver) {
+        this.turnOver = turnOver;
     }
 }

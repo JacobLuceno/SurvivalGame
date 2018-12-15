@@ -52,7 +52,6 @@ public class InventoryViewManager {
     public ArrayList<Button> getButtons() {
         return buttonsList;
     }
-
     public SubScene getSubscene() {
         return subscene;
     }

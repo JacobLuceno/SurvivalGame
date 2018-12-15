@@ -2,7 +2,7 @@ package model;
 
 import java.util.Random;
 
-public class Player extends MobileObject {
+public class Player extends MobileObject{
     public enum Tool {HAND, STAKE, ROCK, SPEAR;
         public Tool upgrade(){
             try {
@@ -19,14 +19,26 @@ public class Player extends MobileObject {
     private int sticks;
     private int stepsToday;
     private Tool tool;
+    private boolean hidden;
+    private boolean harvesting;
+    private boolean resting;
+    private boolean interactingWithBase;
 
-    public Player(Vector2 pos, int maxHP){
-        super(pos, 1, maxHP);
+
+
+    public Player(Vector2 pos, Game game, int maxHP){
+        super(pos, game,1, maxHP);
         stepsToday = 0;
         currentWeight = 0;
         sticks = 0;
         tool = Tool.HAND;
+        hidden = false;
+        harvesting = false;
+        interactingWithBase = false;
+        resting = false;
+        setFacing(Game.Direction.DOWN);
     }
+
 
     public void upgradeTool(){
         tool = tool.upgrade();
@@ -35,23 +47,46 @@ public class Player extends MobileObject {
         sticks -= sticksSpent;
     }
     public void gatherSticks(int sticksHarvested) {sticks += sticksHarvested;}
-    public int attack(){
+
+
+    @Override
+    public boolean flee(){
+        System.out.println("Player attempts to flee");
         Random rand = new Random();
-        int successful = rand.nextInt(1);
+        int success = rand.nextInt(2);
+        if (success == 1){
+            System.out.println("Player has fled");
+            setFled(true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean attack(MobileObject target){
+        System.out.println("Player attacks");
+        Random rand = new Random();
+        int successful = rand.nextInt(2);
         switch(successful){
             case 0:
-                return 0;
+                System.out.println("Player misses");
+                return false;
             default:
+                System.out.println("Player hits!");
                 switch(tool){
                     case HAND:
-                        return 1;
+                        target.sufferHarm(1);
+                        break;
                     case STAKE:
-                        return 2;
+                        target.sufferHarm(2);
+                        break;
                     case ROCK:
-                        return 3;
+                        target.sufferHarm(3);
+                        break;
                     default:
-                        return 4;
+                        target.sufferHarm(4);
                 }
+                return true;
         }
     }
 
@@ -62,6 +97,35 @@ public class Player extends MobileObject {
 
     public void takeStep(){
         stepsToday++;
+    }
+    public void attemptMove(TerrainTile t, Game game){
+        if (t == null) {
+            return;
+        }
+        for (Animal a : game.getAnimals()){
+            if (t.getPosition().getv0() == a.getPosition().getv0() && t.getPosition().getv1() == a.getPosition().getv1()
+                || t.getPosition().getv0() == a.getPriorLoc().getv0() && t.getPosition().getv1() == a.getPriorLoc().getv1()){
+                a.interact(this);
+                game.setAnimalTaggedForRemoval(true);
+                break;
+            }
+        }
+        if (Game.getCurrentEncounter() == null) {
+            setPriorLoc(new Vector2(getPosition().getv0(), getPosition().getv1()));
+            if (t.getHasStatObj()) {
+                if (t.getStatObj() instanceof Interactable) {
+                    t.getStatObj().interact(this);
+                    if (t.getStatObjType() == TerrainTile.StatObjType.TREE) {
+                        harvesting = true;
+                        t.setHasStatObjNull();
+                    }
+                }
+            } else {
+                move(super.getFacing());
+                takeStep();
+                hidden = false;
+            }
+        }
     }
 
 
@@ -82,4 +146,38 @@ public class Player extends MobileObject {
     public Tool getTool() {
         return tool;
     }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public Boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHarvesting(boolean harvesting) {
+        this.harvesting = harvesting;
+    }
+
+    public boolean isHarvesting() {
+        return harvesting;
+    }
+    public boolean isInteractingWithBase() {
+        return interactingWithBase;
+    }
+
+    public void setInteractingWithBase(boolean interactingWithBase) {
+        this.interactingWithBase = interactingWithBase;
+    }
+    public boolean isResting() {
+        return resting;
+    }
+
+    public void setResting(boolean resting) {
+        this.resting = resting;
+    }
+
+
+
+
 }

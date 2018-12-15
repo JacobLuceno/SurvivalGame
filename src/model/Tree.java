@@ -6,16 +6,10 @@ public class Tree extends StationaryObject {
     private boolean hasSticks;
     private int numberSticks;
 
-    public Tree(){
-        super(false);
-        Random rand = new Random();
-        this.numberSticks = rand.nextInt(3) + 1;
-        if (this.numberSticks !=0){
-            hasSticks = true;
-        }
-    }
-    public Tree(Vector2 pos) {
-        super(pos, false);
+
+
+    public Tree(Vector2 pos, Game game) {
+        super(pos, game, false);
         Random rand = new Random();
         this.numberSticks = rand.nextInt(3) + 1;
         if (this.numberSticks != 0) {
@@ -28,6 +22,11 @@ public class Tree extends StationaryObject {
             int returnVal = numberSticks;
             numberSticks = 0;
             return returnVal;
+    }
+    @Override
+    public void interact(Player player){
+        player.gatherSticks(harvestSticks());
+        System.out.println(player.getSticks());
     }
 
     //Getters
