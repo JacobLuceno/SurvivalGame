@@ -10,7 +10,7 @@ public class Game {
     private final static int MAX_ANIMALS = 5;
     private final static int HEIGHT = 100;
     private final static int WIDTH = 100;
-    private final static int STEPS_PER_CYCLE = 100;
+    private final static int STEPS_PER_CYCLE = 1000;
     private final static int DAYS_TO_SURVIVE = 2;
 
     private static CombatEncounter currentEncounter;
@@ -63,8 +63,9 @@ public class Game {
             player.setPosition(new Vector2(rand.nextInt(HEIGHT), rand.nextInt(WIDTH)));
         } while(map.getTerrainMap()[(int) player.getPosition().getv0()][(int) player.getPosition().getv1()].getTerrainType() != TerrainTile.TerrainType.GRASSLAND
                 || map.getTerrainMap()[(int) player.getPosition().getv0()][(int) player.getPosition().getv1()].getHasStatObj());
-        Vector2 displacementVector = player.getPosition().getDisplacementVector(4, 4);
+        Vector2 displacementVector;
         do {
+            displacementVector = player.getPosition().getDisplacementVector(4, 4);
             try {
                 if (map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].getTerrainType() != TerrainTile.TerrainType.WATER) {
                     map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].setHasStatObjNull();
@@ -75,13 +76,13 @@ public class Game {
                     map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].setStatObj(new Base(displacementVector, this));
                 }
             } catch(IndexOutOfBoundsException e){
-                displacementVector = player.getPosition().getDisplacementVector(4, 4);
+                //Do nothing. since base won't have been placed the loop will run again insuring the base is placed
             }
         } while(!TerrainTile.getBasePlaced());
     }
 
     public void checkForEncounter() {
-        if (animals.size() <= MAX_ANIMALS) {
+        if (animals.size() < MAX_ANIMALS) {
             if (!(player.getPriorLoc().getv0() == player.getPosition().getv0() && player.getPriorLoc().getv1() == player.getPosition().getv1())) {
                 Random rand = new Random();
                 int encounter = rand.nextInt(40);

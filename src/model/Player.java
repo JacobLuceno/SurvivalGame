@@ -121,7 +121,7 @@ public class Player extends MobileObject{
                     }
                 }
             } else {
-                move(super.getFacing());
+                move(getFacing());
                 takeStep();
                 hidden = false;
             }

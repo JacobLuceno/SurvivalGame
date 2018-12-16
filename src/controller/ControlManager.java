@@ -126,7 +126,7 @@ public class ControlManager {
                 }
             }
         }
-        if (Game.isInCombat()){
+        if (game.isInCombat()){
             gameWasInCombat = true;
         } else{
             ArrayList<Animal> animals = game.getAnimals();

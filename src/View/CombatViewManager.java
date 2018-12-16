@@ -70,7 +70,7 @@ public class CombatViewManager {
         flightButton.setOnAction(e ->{
             if (combatEncounter.isPlayersTurn()) {
                 if (combatEncounter.getPlayer().flee()){
-                    combatEncounter.setMessage("You attempt to flee!\nYou flee safely back to base!");
+                    combatEncounter.setMessage("You attempt to flee!");
                 } else {
                     combatEncounter.setMessage("You attempt to flee!\nThe animal blocks your path!");
                 }

@@ -9,7 +9,7 @@ public class Rock extends StationaryObject {
     @Override
     public void interact(Player player){
         player.setHidden(true);
-        player.setPosition(super.getPosition());
+        player.setPosition(getPosition());
         player.takeStep();
     }
 }

@@ -14,7 +14,10 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import model.Game;
 
+import javax.naming.ldap.Control;
+
 public class Main extends Application{
+
 
     public static void main(String[] args) {
         launch(args);

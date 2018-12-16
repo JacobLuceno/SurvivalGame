@@ -9,10 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
-import model.Game;
-import model.Map;
-import model.TerrainTile;
-import model.Vector2;
+import model.*;
 
 import java.util.ArrayList;
 
@@ -45,7 +42,7 @@ public class GameViewManager {
     private Vector2 currentPlayerLoc;
     private Pane playerRegion;
     private GridPane terrainGrid;
-    private GridPane statObjGrid;
+    private Pane statObjPane;
     private StackPane nightShiftPane;
     private Pane animalPane;
     private Group group;
@@ -66,12 +63,12 @@ public class GameViewManager {
         playerImage = new ImageView(PLAYER_IMAGE);
         animalImages = new ArrayList<>();
         terrainGrid = setUpTerrainGridPane();
-        statObjGrid = setUpStatObjGridPane();
+        statObjPane = setUpStatObjGridPane();
         animalPane = new Pane();
         animalPane.setMaxSize(game.getWIDTH(), game.getHEIGHT());
         playerRegion = setUpPlayer();
         group = new Group();
-        group.getChildren().addAll(terrainGrid, statObjGrid, playerRegion, animalPane);
+        group.getChildren().addAll(terrainGrid, statObjPane, playerRegion, animalPane);
         setUpCamera();
         subscene = new SubScene(group, WIDTH, HEIGHT);
         subscene.setCamera(camera);
@@ -148,30 +145,45 @@ public class GameViewManager {
         return gp;
     }
     //TODO FORCE THE PANE TO BE OF A CERTAIN SIZE BECAUSE THERE IS A SUPER SMALL CHANCE THAT THE SPRITES WILL NOT LINE UP WITH THEIR GIVEN POSITIONS
-    private GridPane setUpStatObjGridPane(){
+    private Pane setUpStatObjGridPane(){
         Map map = game.getMap();
-        GridPane gp = new GridPane();
+        Pane gp = new Pane();
         for (int y = 0; y < map.getGAME_BOARD_Y(); y++){
             for (int x = 0; x < map.getGAME_BOARD_X(); x++){
                 if (map.getTerrainMap()[y][x].getHasStatObj()) {
+                    StationaryObject statObj = map.getTerrainMap()[y][x].getStatObj();
                     switch (map.getTerrainMap()[y][x].getStatObjType()) {
                         case ROCK:
-                            gp.add(new ImageView(ROCK_IMAGE), x, y);
+                            ImageView obj = new ImageView(ROCK_IMAGE);
+                            obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
+                            obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
+                            gp.getChildren().add(obj);
                             break;
                         case TREE:
                             ImageView tree = new ImageView(TREE_IMAGE);
                             treeSprites[y][x] = tree;
-                            gp.add(tree, x, y);
+                            tree.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
+                            tree.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
+                            gp.getChildren().add(tree);
                             break;
                         case BUSH:
                             if (map.getTerrainMap()[y][x].getTerrainType() == TerrainTile.TerrainType.DESERT) {
-                                gp.add(new ImageView(CACTUS_IMAGE), x, y);
+                                obj = new ImageView(CACTUS_IMAGE);
+                                obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
+                                obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
+                                gp.getChildren().add(obj);
                             } else {
-                                gp.add(new ImageView(BUSH_IMAGE), x, y);
+                                obj = new ImageView(BUSH_IMAGE);
+                                obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
+                                obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
+                                gp.getChildren().add(obj);
                             }
                             break;
                         case BASE:
-                            gp.add(new ImageView(CAMPFIRE_IMAGE), x, y);
+                            obj = new ImageView(CAMPFIRE_IMAGE);
+                            obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
+                            obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
+                            gp.getChildren().add(obj);
                             break;
                         default:
                             System.out.println("not detecting terrain type");
@@ -330,8 +342,11 @@ public class GameViewManager {
         tt.play();
         tt.setOnFinished(e -> {
             if(treeToReplace != null) {
-                statObjGrid.getChildren().remove(treeToReplace);
-                statObjGrid.add(new ImageView(TREE_STUMP_IMAGE),(int)x,(int)y);
+                statObjPane.getChildren().remove(treeToReplace);
+                ImageView stump = new ImageView(TREE_STUMP_IMAGE);
+                stump.setTranslateX(x*GAMETILE_WIDTH);
+                stump.setTranslateY(y*GAMETILE_WIDTH);
+                statObjPane.getChildren().add(stump);
             }
             TranslateTransition tt2 = new TranslateTransition(new Duration(150),playerImage);
             tt2.setToX(game.getPlayer().getPosition().getv1()*GAMETILE_WIDTH);

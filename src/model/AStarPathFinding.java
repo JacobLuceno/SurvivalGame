@@ -55,6 +55,7 @@ public class AStarPathFinding {
                         return false;
                     }
                 }
+                break;
             case DESERT:
                 if (canWalkDesert){
                     if (hasObj) {
@@ -65,6 +66,7 @@ public class AStarPathFinding {
                         return false;
                     }
                 }
+                break;
             case WATER:
                 if (canWalkWater){
                     if (hasObj) {
@@ -75,9 +77,11 @@ public class AStarPathFinding {
                         return false;
                     }
                 }
+                break;
             default:
                 return true;
         }
+        return  true;
     }
 
     // Used to calculate hCost.

@@ -65,7 +65,7 @@ public class CombatEncounter {
                     if (animal instanceof Carnivore) {
                         message = "The animal attacks viciously!\n It bites you!";
                     } else {
-                        message = "The animal attempts to flee!\n It gets away!";
+                        message = "The animal attempts to flee!";
                     }
                 } else{
                     if (animal instanceof Carnivore) {
@@ -82,8 +82,13 @@ public class CombatEncounter {
             if (!animal.isAlive()){
                 message = "You've slayed the animal!";
                 //Give player meat
+            } else if (animal.isFled()){
+                message = "It gets away!";
             } else if (player.isFled()){
-                player.setPosition(TerrainTile.getBaseLocation().getDisplacementVector(5,5));
+                do {
+                    player.setPosition(TerrainTile.getBaseLocation().getDisplacementVector(5, 5));
+                } while(player.getPosition().getv1() < 0 || player.getPosition().getv1() >= getPlayer().getGame().getWIDTH()
+                    || player.getPosition().getv0() < 0 || player.getPosition().getv0() >= getPlayer().getGame().getHEIGHT());
                 message = "You flee back to base!";
             }
             if (!player.isAlive()){
