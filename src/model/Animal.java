@@ -44,7 +44,6 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
         Game game = getGame();
         TerrainTile[][] tMap = game.getMap().getTerrainMap();
         boolean pathChosen = false;
-        int attempts = 0;
         do {
             targetPos = getPosition().getDisplacementVector(5, 5);
             if (targetPos.getv0() < game.getHEIGHT() && targetPos.getv1() < game.getWIDTH() && targetPos.getv0() >= 0 && targetPos.getv1() >= 0) {
@@ -55,21 +54,22 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
                         if (tMap[(int) targetPos.getv0()][(int) targetPos.getv1()].getStatObj().isPassable()) {
                             pathChosen = true;
                         }
+                    } else {
+                        pathChosen = true;
                     }
                 } else if (canWalkDesert && tMap[(int) targetPos.getv0()][(int) targetPos.getv1()].getTerrainType() == TerrainTile.TerrainType.DESERT) {
                     if (tMap[(int) targetPos.getv0()][(int) targetPos.getv1()].getHasStatObj()) {
                         if (tMap[(int) targetPos.getv0()][(int) targetPos.getv1()].getStatObj().isPassable()) {
                             pathChosen = true;
                         }
+                    }else {
+                        pathChosen = true;
                     }
-                } else if (attempts > 100) {
-                    targetPos = getPosition();
-                    break;
                 }
-                attempts++;
             }
         } while (!pathChosen);
     }
+
     public void wander(){
         if (getPosition().getv1() == getGame().getPlayer().getPosition().getv1() && getPosition().getv0() == getGame().getPlayer().getPosition().getv0()){
             this.interact(getGame().getPlayer());
@@ -118,12 +118,10 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
 
     @Override
     public boolean flee() {
-        System.out.println("Animal took turn");
         Random rand = new Random();
         int fleeing = rand.nextInt(4);
         if (fleeing == 1){
             setFled(true);
-            System.out.println("Animal has fled");
             return true;
         }
         return false;
@@ -131,15 +129,12 @@ public abstract class Animal extends MobileObject implements iTakesTurns, Intera
 
     @Override
     public boolean attack(MobileObject target) {
-        System.out.println("Animal took turn");
         Random rand = new Random();
         int successful = rand.nextInt(2);
         switch(successful){
             case 0:
-                System.out.println("Animal misses player");
                 return false;
             default:
-                System.out.println("Animal hits player");
                 target.sufferHarm(damage);
                 return true;
             }

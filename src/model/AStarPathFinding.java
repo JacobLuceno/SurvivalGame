@@ -99,6 +99,7 @@ public class AStarPathFinding {
         ArrayList<Tile> openSet = new ArrayList<>();
         ArrayList<Tile> closedSet = new ArrayList<>();
 
+
         for (Tile[] y : grid){
             for (Tile x : y){
                 x.fCost = 0.0;

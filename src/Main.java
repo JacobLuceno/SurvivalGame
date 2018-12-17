@@ -1,9 +1,7 @@
 
 //TODO HANDLE KNOWN ISSUES
-//  Player can be pushed outside bounds of game when fleeing if base is near edge
 //  Buttons in general need to be prettied up
 //  Static occurrences in Game and TerrainTile, which may be better off passed as parameters
-//  sometimes game crashes when new animal is spawned. no exceptions or errors thrown.  Not sure how to tackle this one
 //  music player crashes on startup fairly often
 
 

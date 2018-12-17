@@ -13,7 +13,6 @@ public class Carnivore extends Animal {
         super(pos, game, speed, maxHP, meatVal, damage, canWalk, combatImage, gameImage);
         this.type = type;
         setFled(false);
-        System.out.println("Animal Instantiation completed.");
     }
 
     @Override

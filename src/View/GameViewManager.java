@@ -101,11 +101,9 @@ public class GameViewManager {
                             animalPane.getChildren().remove(animalImage);
                             curAnimalListSize--;
                             animalImages.remove(animalImage);
-                            System.out.println("Animal Image Removed");
                             break;
                         }
                     }
-                    System.out.println("Number of Animal Images is " + Integer.toString(curAnimalListSize));
                     game.setAnimalTaggedForRemoval(false);
                 }
             }
