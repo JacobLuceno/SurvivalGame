@@ -1,8 +1,11 @@
 package controller;
 
 import javafx.animation.AnimationTimer;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import model.Animal;
 import model.Game;
 import model.Player;
@@ -64,8 +67,20 @@ public class ControlManager {
             if (e.getCode() == KeyCode.LEFT){
                 setLeftKeyDown(false);
             }
+            if (e.getCode() == KeyCode.R){
+                game.getPlayer().Rest();
+            }
+            if (e.getCode() == KeyCode.B){
+                if (game.getPlayer().checkForBase()){
+                    game.getBase().buyNewBaseUpgrade(game.getPlayer());
+                }
+            }
+            if (e.getCode() == KeyCode.T){
+                if (game.getPlayer().checkForBase()){
+                    game.getBase().buyNewToolUpgrade(game.getPlayer());
+                }
+            }
         });
-
     }
 
     private void gameLoop(){
@@ -116,11 +131,12 @@ public class ControlManager {
             }
             game.despawnDistantAnimals();
             game.checkDayCycle();
+
             if (!game.getPlayer().isAlive()){
                 game.setGameOver(true);
                 game.setGameWon(false);
             } else{
-                if (game.getDay() == 2){
+                if (game.getDay() == game.getDaysToSurvive()){
                     game.setGameWon(true);
                     game.setGameOver(true);
                 }

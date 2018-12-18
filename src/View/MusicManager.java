@@ -11,7 +11,7 @@ public class MusicManager {
         File file = new File("src/View/Resources/videogame_music_demo.mp3");
         Media gameMusic = new Media(file.toURI().toString());
         MediaPlayer mp = new MediaPlayer(gameMusic);
-        mp.setOnEndOfMedia(() -> mp.seek(new Duration(0)));
         mp.play();
+        mp.setOnEndOfMedia(() -> mp.seek(new Duration(0)));
     }
 }

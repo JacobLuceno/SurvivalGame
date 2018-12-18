@@ -23,6 +23,9 @@ public class Player extends MobileObject{
     private boolean harvesting;
     private boolean resting;
     private boolean interactingWithBase;
+    private boolean displayRestPrompt;
+    private boolean displayUpgradesPrompt;
+    private int cyclesSinceRest;
 
 
 
@@ -36,15 +39,26 @@ public class Player extends MobileObject{
         harvesting = false;
         interactingWithBase = false;
         resting = false;
+        cyclesSinceRest = 1;
         setFacing(Game.Direction.DOWN);
+        if (checkForBase()){
+            displayUpgradesPrompt = true;
+        }
+        if (checkForRestable()){
+            displayRestPrompt = true;
+        }
     }
 
 
     public void upgradeTool(){
         tool = tool.upgrade();
     }
-    public void spendSticks(int sticksSpent){
-        sticks -= sticksSpent;
+    public boolean spendSticks(int sticksSpent){
+        if (getSticks() - sticksSpent >= 0){
+            sticks -= sticksSpent;
+            return true;
+        }
+        return false;
     }
     public void gatherSticks(int sticksHarvested) {sticks += sticksHarvested;}
 
@@ -94,7 +108,6 @@ public class Player extends MobileObject{
         int currentHP = this.getCurrentHitPoints() + HP;
         this.setCurrentHitPoints( (currentHP > this.getMAX_HIT_POINTS()) ? this.getMAX_HIT_POINTS() : currentHP);
     }
-
     public void takeStep(){
         stepsToday++;
     }
@@ -105,12 +118,14 @@ public class Player extends MobileObject{
         for (Animal a : game.getAnimals()){
             if (t.getPosition().getv0() == a.getPosition().getv0() && t.getPosition().getv1() == a.getPosition().getv1()
                 || t.getPosition().getv0() == a.getPriorLoc().getv0() && t.getPosition().getv1() == a.getPriorLoc().getv1()){
+                displayUpgradesPrompt = false;
+                displayRestPrompt = false;
                 a.interact(this);
                 break;
             }
         }
 
-        if (Game.getCurrentEncounter() == null) {
+        if (game.getCurrentEncounter() == null) {
             setPriorLoc(new Vector2(getPosition().getv0(), getPosition().getv1()));
             if (t.getHasStatObj()) {
                 if (t.getStatObj() instanceof Interactable) {
@@ -124,8 +139,85 @@ public class Player extends MobileObject{
                 move(getFacing());
                 takeStep();
                 hidden = false;
+
+            }
+            displayRestPrompt = false;
+            displayUpgradesPrompt = false;
+            if (checkForBase()){
+                displayUpgradesPrompt = true;
+            }
+            if (checkForRestable()){
+                displayRestPrompt = true;
+            }
+
+        }
+    }
+    public void Rest(){
+        if (cyclesSinceRest >= 2) {
+            int x = (int) getPosition().getv1();
+            int y = (int) getPosition().getv0();
+            TerrainTile[][] tMap = getGame().getMap().getTerrainMap();
+
+            for (int i = y - 1; i < y + 2; i++) {
+                for (int j = x - 1; j < x + 2; j++) {
+                    try{
+                        if (tMap[i][j].getHasStatObj()) {
+                            if (tMap[i][j].getStatObj() instanceof iRestable) {
+                                resting = true;
+                                getGame().clearAllAnimals();
+                                ((iRestable) tMap[i][j].getStatObj()).restAt(this);
+                                break;
+                            }
+                        }
+                    } catch(IndexOutOfBoundsException e){
+                        //do nothing. just an illegal space to check
+                    }
+                }
+
             }
         }
+    }
+
+    public boolean checkForRestable(){
+        int x = (int) getPosition().getv1();
+        int y = (int) getPosition().getv0();
+        TerrainTile[][] tMap = getGame().getMap().getTerrainMap();
+
+        for (int i = y - 1; i < y + 2; i++) {
+            for (int j = x - 1; j < x + 2; j++) {
+                try {
+                    if (tMap[i][j].getHasStatObj()) {
+                        if (tMap[i][j].getStatObj() instanceof iRestable) {
+                            return true;
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e){
+                    // do nothing. just referencing a grid space out of bounds
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkForBase(){
+        int x = (int) getPosition().getv1();
+        int y = (int) getPosition().getv0();
+        TerrainTile[][] tMap = getGame().getMap().getTerrainMap();
+
+        for (int i = y - 1; i < y + 2; i++) {
+            for (int j = x - 1; j < x + 2; j++) {
+                try {
+                    if (tMap[i][j].getHasStatObj()) {
+                        if (tMap[i][j].getStatObj() instanceof Base) {
+                            return true;
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e){
+                    //do nothing. just a space off the map
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -177,7 +269,28 @@ public class Player extends MobileObject{
         this.resting = resting;
     }
 
+    public int getCyclesSinceRest() {
+        return cyclesSinceRest;
+    }
 
+    public void setCyclesSinceRest(int cyclesSinceRest) {
+        this.cyclesSinceRest = cyclesSinceRest;
+    }
 
+    public boolean isDisplayRestPrompt() {
+        return displayRestPrompt;
+    }
+
+    public boolean isDisplayUpgradesPrompt() {
+        return displayUpgradesPrompt;
+    }
+
+    public void setDisplayRestPrompt(boolean displayRestPrompt) {
+        this.displayRestPrompt = displayRestPrompt;
+    }
+
+    public void setDisplayUpgradesPrompt(boolean displayUpgradesPrompt) {
+        this.displayUpgradesPrompt = displayUpgradesPrompt;
+    }
 
 }

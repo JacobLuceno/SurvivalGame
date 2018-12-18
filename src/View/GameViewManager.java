@@ -4,10 +4,14 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.*;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 import model.*;
 
@@ -19,6 +23,9 @@ public class GameViewManager {
     private static final int WIDTH = 672;
     private static final int GAMETILE_WIDTH = 32;
 
+    private static final String UPGRADE_TOOL_PROMPT_TEXT = "PRESS 'T' TO UPGRADE TOOL: STICKS x ";
+    private static final String UPGRADE_BASE_PROMPT_TEXT = "PRESS 'B' TO UPGRADE BASE: STICKS x ";
+    private static final String REST_PROMPT_TEXT = "PRESS 'R' TO REST";
 
     private static final Image GRASSLAND_IMAGE = new Image("View/Resources/grass.png");
     private static final Image DESERT_IMAGE = new Image("View/Resources/desert.png");
@@ -47,10 +54,16 @@ public class GameViewManager {
     private Pane animalPane;
     private Group group;
     private Circle nightClippingPlane;
+    private Circle restingClippingPlane;
     private ScaleTransition st;
 
     private boolean dayMode;
     private ImageView[][] treeSprites;
+
+    private Label restPrompt;
+    private Label upgradePrompt;
+    private boolean restPromptDisplayed;
+    private boolean upgradePromptDisplayed;
 
     private int curAnimalListSize;
 
@@ -71,6 +84,10 @@ public class GameViewManager {
         group.getChildren().addAll(terrainGrid, statObjPane, playerRegion, animalPane);
         setUpCamera();
         subscene = new SubScene(group, WIDTH, HEIGHT);
+        restPrompt = new Label();
+        upgradePrompt = new Label();
+        restPromptDisplayed = false;
+        upgradePromptDisplayed = false;
         subscene.setCamera(camera);
 
         gameLoop();
@@ -84,8 +101,12 @@ public class GameViewManager {
                 if (!Game.isInCombat()) {
                     updateCameraPosition();
                     updatePlayerLocation();
+                    displayPrompts();
                     updateAnimalsLocations();
                     updateDayCycle();
+                    if (game.getPlayer().isResting()){
+                        restingAnimation();
+                    }
                     if (!dayMode) {
                         updateNightShiftLocation();
                     }
@@ -127,13 +148,16 @@ public class GameViewManager {
             for (int x = 0; x < map.getGAME_BOARD_X(); x++){
                 switch (map.getTerrainMap()[y][x].getTerrainType()){
                     case GRASSLAND:
-                        gp.add(new ImageView(GRASSLAND_IMAGE), x, y);
+                        ImageView iv = new ImageView(GRASSLAND_IMAGE);
+                        gp.add(iv, x, y);
                         break;
                     case DESERT:
-                        gp.add(new ImageView(DESERT_IMAGE), x, y);
+                        iv = new ImageView(DESERT_IMAGE);
+                        gp.add(iv, x, y);
                         break;
                     case WATER:
-                        gp.add(new ImageView(WATER_IMAGE), x, y);
+                        iv = new ImageView(WATER_IMAGE);
+                        gp.add(iv, x, y);
                         break;
                     default:
                         System.out.println("not detecting terrain type");
@@ -142,7 +166,7 @@ public class GameViewManager {
         }
         return gp;
     }
-    //TODO FORCE THE PANE TO BE OF A CERTAIN SIZE BECAUSE THERE IS A SUPER SMALL CHANCE THAT THE SPRITES WILL NOT LINE UP WITH THEIR GIVEN POSITIONS
+
     private Pane setUpStatObjGridPane(){
         Map map = game.getMap();
         Pane gp = new Pane();
@@ -153,12 +177,16 @@ public class GameViewManager {
                     switch (map.getTerrainMap()[y][x].getStatObjType()) {
                         case ROCK:
                             ImageView obj = new ImageView(ROCK_IMAGE);
+                            obj.setCache(true);
+                            obj.setCacheHint(CacheHint.SPEED);
                             obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
                             obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
                             gp.getChildren().add(obj);
                             break;
                         case TREE:
                             ImageView tree = new ImageView(TREE_IMAGE);
+                            tree.setCache(true);
+                            tree.setCacheHint(CacheHint.SPEED);
                             treeSprites[y][x] = tree;
                             tree.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
                             tree.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
@@ -167,11 +195,15 @@ public class GameViewManager {
                         case BUSH:
                             if (map.getTerrainMap()[y][x].getTerrainType() == TerrainTile.TerrainType.DESERT) {
                                 obj = new ImageView(CACTUS_IMAGE);
+                                obj.setCache(true);
+                                obj.setCacheHint(CacheHint.SPEED);
                                 obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
                                 obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
                                 gp.getChildren().add(obj);
                             } else {
                                 obj = new ImageView(BUSH_IMAGE);
+                                obj.setCache(true);
+                                obj.setCacheHint(CacheHint.SPEED);
                                 obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
                                 obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
                                 gp.getChildren().add(obj);
@@ -179,6 +211,8 @@ public class GameViewManager {
                             break;
                         case BASE:
                             obj = new ImageView(CAMPFIRE_IMAGE);
+                            obj.setCache(true);
+                            obj.setCacheHint(CacheHint.SPEED);
                             obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
                             obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
                             gp.getChildren().add(obj);
@@ -255,6 +289,39 @@ public class GameViewManager {
         nightShiftPane.setTranslateY(playerImage.getTranslateY() - 245);
     }
 
+    private void displayPrompts(){
+        Player player = game.getPlayer();
+        if (player.isDisplayUpgradesPrompt()){
+            if (!upgradePromptDisplayed) {
+                upgradePromptDisplayed = true;
+                upgradePrompt.setTextFill(Color.WHITE);
+                group.getChildren().add(upgradePrompt);
+            }
+            upgradePrompt.setTranslateX(playerImage.getTranslateX()-80);
+            upgradePrompt.setTranslateY(playerImage.getTranslateY()+30);
+            upgradePrompt.setText(UPGRADE_BASE_PROMPT_TEXT + Integer.toString(game.getBase().getCurBaseCost()) + '\n'
+                            + UPGRADE_TOOL_PROMPT_TEXT + Integer.toString(game.getBase().getCurToolCost()));
+
+        }else {
+            upgradePromptDisplayed = false;
+            group.getChildren().remove(upgradePrompt);
+        }
+        if (player.isDisplayRestPrompt()){
+            if (!restPromptDisplayed) {
+                restPromptDisplayed = true;
+                restPrompt.setTextFill(Color.WHITE);
+                group.getChildren().add(restPrompt);
+            }
+            restPrompt.setTranslateX(playerImage.getTranslateX()-25);
+            restPrompt.setTranslateY(playerImage.getTranslateY()-15);
+            restPrompt.setText(REST_PROMPT_TEXT);
+        } else{
+            restPromptDisplayed = false;
+            group.getChildren().remove(restPrompt);
+        }
+
+    }
+
     private void nightShiftEndAnimation(){
         st = new ScaleTransition(Duration.millis(1000), nightClippingPlane);
         st.setToX(10f);
@@ -294,6 +361,67 @@ public class GameViewManager {
                     aiv.setAnimationTriggered(false);
                 });
             }
+    }
+
+    private void restingAnimation(){
+        boolean nextComesNight;
+        game.getPlayer().setResting(false);
+        game.getPlayer().setBusy(true);
+        if (dayMode){
+            restingClippingPlane = new Circle(playerImage.getLayoutX() + 336,playerImage.getLayoutY() + 336,1500);
+            nextComesNight= true;
+        } else {
+            restingClippingPlane = new Circle(playerImage.getLayoutX() + 336,playerImage.getLayoutY() + 336,150);
+            nextComesNight = false;
+        }
+        st = new ScaleTransition(Duration.millis(750), restingClippingPlane);
+        st.setToX(0.00015);
+        st.setToY(0.00015);
+        st.setAutoReverse(false);
+        subscene.setClip(restingClippingPlane);
+
+        if (game.getCurrentEncounter() != null){
+            st.setOnFinished(e -> {
+                game.getPlayer().setBusy(false);
+                game.setInCombat(true);
+                subscene.setClip(nightClippingPlane);
+            });
+            st.play();
+
+        } else {
+            st.setOnFinished(e-> {
+                ScaleTransition st2 = new ScaleTransition(Duration.millis(750), restingClippingPlane);
+                st2.setAutoReverse(false);
+                System.out.println("Shrinking animation finished");
+                if (!nextComesNight) {
+                    st2.setToX(10f);
+                    st2.setToY(10f);
+                    group.getChildren().remove(nightShiftPane);
+                } else {
+                    st2.setToX(1/10f);
+                    st2.setToY(1/10f);
+                    nightShiftPane = new StackPane();
+                    ImageView nightShiftImageView = new ImageView(FIRE_BLOOM);
+                    nightShiftPane.getChildren().add(nightShiftImageView);
+                    updateNightShiftLocation();
+                    group.getChildren().add(nightShiftPane);
+                }
+                game.getPlayer().setStepsToday(game.getSTEPS_PER_CYCLE() + 1);
+                game.checkDayCycle();
+                dayMode = game.isDayTime();
+
+                st2.setOnFinished(e2 -> {
+                    if  (!dayMode){
+                        nightClippingPlane = new Circle(playerImage.getLayoutX() + 336,playerImage.getLayoutY() + 336,150);
+                        subscene.setClip(nightClippingPlane);
+                    } else{
+                        subscene.setClip(null);
+                    }
+                    game.getPlayer().setBusy(false);});
+                st2.play();
+            });
+            st.play();
+        }
     }
 
     private void harvestingAnimation(){

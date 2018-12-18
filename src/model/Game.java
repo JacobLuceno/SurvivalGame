@@ -10,13 +10,14 @@ public class Game {
     private final static int MAX_ANIMALS = 5;
     private final static int HEIGHT = 100;
     private final static int WIDTH = 100;
-    private final static int STEPS_PER_CYCLE = 1000;
-    private final static int DAYS_TO_SURVIVE = 2;
+    private final static int STEPS_PER_CYCLE = 100;
+    private final int DAYS_TO_SURVIVE = 7;
 
     private static CombatEncounter currentEncounter;
 
     private Map map;
     private Player player;
+    private Base base;
     private ArrayList<Animal> animals;
     private boolean dayTime;
     private static boolean inCombat;
@@ -65,7 +66,7 @@ public class Game {
                 || map.getTerrainMap()[(int) player.getPosition().getv0()][(int) player.getPosition().getv1()].getHasStatObj());
         Vector2 displacementVector;
         do {
-            displacementVector = player.getPosition().getDisplacementVector(4, 4);
+            displacementVector = player.getPosition().getDisplacementVector(2, 2);
             try {
                 if (map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].getTerrainType() != TerrainTile.TerrainType.WATER) {
                     map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].setHasStatObjNull();
@@ -73,7 +74,8 @@ public class Game {
                     map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].setStatObjType(TerrainTile.StatObjType.BASE);
                     TerrainTile.setBasePlaced(true);
                     TerrainTile.setBaseLocation(displacementVector);
-                    map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].setStatObj(new Base(displacementVector, this));
+                    base = new Base(displacementVector, this);
+                    map.getTerrainMap()[(int) displacementVector.getv0()][(int) displacementVector.getv1()].setStatObj(base);
                 }
             } catch(IndexOutOfBoundsException e){
                 //Do nothing. since base won't have been placed the loop will run again insuring the base is placed
@@ -99,6 +101,14 @@ public class Game {
             }
         }
     }
+
+    public void clearAllAnimals(){
+        for (Animal animal : animals) {
+            animal.setRemove(true);
+        }
+        animalTaggedForRemoval = true;
+    }
+
     private Vector2 spawnNewAnimalLocation(){
         switch(player.getFacing()){
             case UP:
@@ -184,6 +194,10 @@ public class Game {
         if (player.getStepsToday() > STEPS_PER_CYCLE){
             dayTime = !dayTime;
             player.setStepsToday(0);
+            player.setCyclesSinceRest(player.getCyclesSinceRest() + 1);
+            if (player.getCyclesSinceRest() > 2){
+                player.sufferHarm(player.getCyclesSinceRest());
+            }
             if (dayTime){
                 day++;
                 System.out.println("Day: " + Integer.toString(day));
@@ -254,8 +268,14 @@ public class Game {
         return day;
     }
 
-    public static int getDaysToSurvive() {
+    public int getDaysToSurvive() {
         return DAYS_TO_SURVIVE;
     }
+
+
+    public Base getBase() {
+        return base;
+    }
+
 
 }

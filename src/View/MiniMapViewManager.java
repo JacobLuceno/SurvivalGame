@@ -74,7 +74,7 @@ public class MiniMapViewManager {
     }
 
     private void updateMiniMap(){
-        Vector2 baseLoc = new Vector2(0,0);
+        Vector2 baseLoc = null;
         for (TerrainTile[] y : game.getMap().getTerrainMap()){
             for (TerrainTile x : y){
                 if (x.isRevealedOnMiniMap()){
@@ -98,8 +98,10 @@ public class MiniMapViewManager {
                 gc.fillRect(x.getPosition().getv1()*2, x.getPosition().getv0()*2, 2, 2);
                 gc.setFill(Color.RED);
                 gc.fillRect(game.getPlayer().getPosition().getv1()*2, game.getPlayer().getPosition().getv0()*2,3,3);
-                gc.setFill(Color.DARKBLUE);
-                gc.fillRect(baseLoc.getv1()*2, baseLoc.getv0()*2,3,3);
+                if (baseLoc != null) {
+                    gc.setFill(Color.DARKBLUE);
+                    gc.fillRect(baseLoc.getv1() * 2, baseLoc.getv0() * 2, 3, 3);
+                }
             }
         }
     }

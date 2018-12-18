@@ -23,8 +23,6 @@ public class CombatEncounter {
 
     CombatEncounter(Player player, Animal animal){
 
-
-        System.out.println("Animal Tagged for removal.");
         player.getGame().setAnimalTaggedForRemoval(true);
         animal.setRemove(true);
         this.player = player;
@@ -37,10 +35,9 @@ public class CombatEncounter {
         player.setFled(false);
         encounterOver = false;
         determineCombatOrder();
-        System.out.println("Combat encounter created.");
     }
 
-    private void determineCombatOrder(){
+    protected void determineCombatOrder(){
         Random rand = new Random();
         int encounterOrder = rand.nextInt(2);
         switch(encounterOrder){
@@ -87,8 +84,8 @@ public class CombatEncounter {
             } else if (player.isFled()){
                 do {
                     player.setPosition(TerrainTile.getBaseLocation().getDisplacementVector(5, 5));
-                } while(player.getPosition().getv1() < 0 || player.getPosition().getv1() >= getPlayer().getGame().getWIDTH()
-                    || player.getPosition().getv0() < 0 || player.getPosition().getv0() >= getPlayer().getGame().getHEIGHT());
+                } while(player.getPosition().getv1() < 0 || player.getPosition().getv1() >= player.getGame().getWIDTH()
+                    || player.getPosition().getv0() < 0 || player.getPosition().getv0() >= player.getGame().getHEIGHT());
                 message = "You flee back to base!";
             }
             if (!player.isAlive()){
