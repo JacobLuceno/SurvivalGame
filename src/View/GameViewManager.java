@@ -36,7 +36,7 @@ public class GameViewManager {
     private static final Image BUSH_HARVESTED_IMAGE = new Image("View/Resources/bush_harvested.png");
     private static final Image CACTUS_IMAGE = new Image("View/Resources/cactus.png");
     private static final Image CACTUS_HARVESTED_IMAGE = new Image("View/Resources/cactus_harvested.png");
-    private static final Image PLAYER_IMAGE = new Image("View/Resources/player test sprite.png");
+    private static final Image PLAYER_IMAGE = new Image("View/Resources/player.png");
     private static final Image FIRE_BLOOM = new Image("View/Resources/fireBloom.png");
     private static final Image CAMPFIRE_IMAGE = new Image("View/Resources/campFire.png");
     private static final Image [] UPGRADED_BASE_IMAGES = new Image[] {new Image("View/Resources/shack.png"),
@@ -54,6 +54,7 @@ public class GameViewManager {
     private Pane playerRegion;
     private GridPane terrainGrid;
     private Pane statObjPane;
+    private Pane rockPane;
     private StackPane nightShiftPane;
     private Pane animalPane;
     private Group group;
@@ -79,13 +80,14 @@ public class GameViewManager {
         removableSprites = new ImageView[game.getHEIGHT()][game.getWIDTH()];
         playerImage = new ImageView(PLAYER_IMAGE);
         animalImages = new ArrayList<>();
+        rockPane = new Pane();
         terrainGrid = setUpTerrainGridPane();
         statObjPane = setUpStatObjGridPane();
         animalPane = new Pane();
         animalPane.setMaxSize(game.getWIDTH(), game.getHEIGHT());
         playerRegion = setUpPlayer();
         group = new Group();
-        group.getChildren().addAll(terrainGrid, statObjPane, playerRegion, animalPane);
+        group.getChildren().addAll(terrainGrid, statObjPane, playerRegion, rockPane, animalPane);
         setUpCamera();
         subscene = new SubScene(group, WIDTH, HEIGHT);
         restPrompt = new Label();
@@ -121,14 +123,17 @@ public class GameViewManager {
                     }
                 }
                 if (game.isAnimalTaggedForRemoval()) {
+                    ArrayList<AnimalImageView> removeList = new ArrayList<>();
                     for (AnimalImageView animalImage : animalImages){
                         if (animalImage.getAnimal().isRemove()) {
+                            removeList.add(animalImage);
                             game.getAnimals().remove(animalImage.getAnimal());
                             animalPane.getChildren().remove(animalImage);
                             curAnimalListSize--;
-                            animalImages.remove(animalImage);
-                            break;
                         }
+                    }
+                    for (AnimalImageView a : removeList){
+                        animalImages.remove(a);
                     }
                     game.setAnimalTaggedForRemoval(false);
                 }
@@ -186,7 +191,7 @@ public class GameViewManager {
                             obj.setCacheHint(CacheHint.SPEED);
                             obj.setTranslateX(statObj.getPosition().getv1()*GAMETILE_WIDTH);
                             obj.setTranslateY(statObj.getPosition().getv0()*GAMETILE_WIDTH);
-                            gp.getChildren().add(obj);
+                            rockPane.getChildren().add(obj);
                             break;
                         case TREE:
                             ImageView tree = new ImageView(TREE_IMAGE);

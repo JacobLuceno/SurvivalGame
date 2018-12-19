@@ -82,13 +82,24 @@ public class CombatEncounter {
             } else if (animal.isFled()){
                 message = "It gets away!";
             } else if (player.isFled()){
-                Vector2 playerInitialPos = player.getPosition();
-                do {
-                    player.setPosition(playerInitialPos.getDisplacementVector(game.getHEIGHT(), game.getWIDTH()));
-                    System.out.println(player.getPosition().toString());
-                } while(player.getPosition().getv1() < 0 || player.getPosition().getv1() >= player.getGame().getWIDTH()
-                    || player.getPosition().getv0() < 0 || player.getPosition().getv0() >= player.getGame().getHEIGHT());
-                message = "You flee into the wilderness!";
+                if (animal instanceof Carnivore) {
+                    Random rand = new Random();
+                    Map map = game.getMap();
+                    do {
+                        player.setPosition(new Vector2(rand.nextInt(game.getHEIGHT()), rand.nextInt(game.getWIDTH())));
+                    }
+                    while (map.getTerrainMap()[(int) player.getPosition().getv0()][(int) player.getPosition().getv1()].getTerrainType() != TerrainTile.TerrainType.GRASSLAND
+                        || map.getTerrainMap()[(int) player.getPosition().getv0()][(int) player.getPosition().getv1()].getHasStatObj());
+                    message = "You flee into the wilderness!";
+                } else {
+                    if (animal instanceof Herbivore){
+                        if (((Herbivore) animal).getType() != Herbivore.HerbType.FISH){
+                            message = "You let the animal scamper off.";
+                        } else{
+                            message = "You let the fish swim off.";
+                        }
+                    }
+                }
             }
             if (!player.isAlive()){
                 message = "You've been mortally wounded.\nYou didn't survive.";

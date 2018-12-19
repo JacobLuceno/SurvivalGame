@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import model.Carnivore;
 import model.CombatEncounter;
 import model.Game;
 
@@ -34,6 +35,7 @@ public class CombatViewManager {
 
     public CombatViewManager(Game game, CombatEncounter combatEncounter, Scene parentScene){
         buttons = new ArrayList<>();
+        combatEncounter.setGame(game);
         messageDisplayed = false;
         combatCanvas = new Canvas(WIDTH,HEIGHT);
         gc = combatCanvas.getGraphicsContext2D();
@@ -47,17 +49,17 @@ public class CombatViewManager {
         gameLoop();
     }
 
-    private void setUpCombatUI(){
+    private void setUpCombatUI() {
         ImageView combatUIPane = new ImageView(COMBAT_PANE_IMAGE);
-        ImageView combatPortrait =  new ImageView(combatEncounter.getAnimal().getCombatImage());
+        ImageView combatPortrait = new ImageView(combatEncounter.getAnimal().getCombatImage());
         combatPortrait.setLayoutX(136);
-        combatPortrait.setLayoutY(3f/4f*HEIGHT - 450);
+        combatPortrait.setLayoutY(3f / 4f * HEIGHT - 450);
 
         Button fightButton = new Button("FIGHT");
         Button flightButton = new Button("FLIGHT");
-        fightButton.setOnAction(e->{
+        fightButton.setOnAction(e -> {
             if (combatEncounter.isPlayersTurn()) {
-                if (combatEncounter.getPlayer().attack(combatEncounter.getAnimal())){
+                if (combatEncounter.getPlayer().attack(combatEncounter.getAnimal())) {
                     combatEncounter.setMessage("You attack the animal!\nYou strike it savagely!");
                 } else {
                     combatEncounter.setMessage("You attack the animal!\nIt leaps out of the way!");
@@ -67,18 +69,24 @@ public class CombatViewManager {
                 combatEncounter.setAnimalsTurn(true);
             }
         });
-        flightButton.setOnAction(e ->{
+        flightButton.setOnAction(e -> {
             if (combatEncounter.isPlayersTurn()) {
-                if (combatEncounter.getPlayer().flee()){
-                    combatEncounter.setMessage("You attempt to flee!");
+                if (combatEncounter.getAnimal() instanceof Carnivore) {
+                    if (combatEncounter.getPlayer().flee()) {
+                        combatEncounter.setMessage("You attempt to flee!");
+                    } else {
+                        combatEncounter.setMessage("You attempt to flee!\nThe animal blocks your path!");
+                    }
+                    combatEncounter.setMessageToDisplay(true);
                 } else {
-                    combatEncounter.setMessage("You attempt to flee!\nThe animal blocks your path!");
+                    combatEncounter.getPlayer().setFled(true);
                 }
-                combatEncounter.setMessageToDisplay(true);
-                combatEncounter.setPlayersTurn(false);
-                combatEncounter.setAnimalsTurn(true);
+                    combatEncounter.setPlayersTurn(false);
+                    combatEncounter.setAnimalsTurn(true);
+
             }
         });
+
         fightButton.setFocusTraversable(false);
         flightButton.setFocusTraversable(false);
         buttons.add(fightButton);
