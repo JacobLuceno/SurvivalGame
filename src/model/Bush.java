@@ -1,21 +1,28 @@
 package model;
 
+import java.util.Random;
+
 public class Bush extends  StationaryObject{
 
     int numberOfBerries;
     boolean hasBerries;
 
-    public Bush(){
-        super(true);
-        numberOfBerries = 1;
-        hasBerries = true;
 
+    public Bush( Vector2 position, Game game){
+        super(position, game, true);
+        Random rand = new Random();
+        numberOfBerries = rand.nextInt(3) - 1;
+        if (numberOfBerries > 0) {
+            hasBerries = true;
+        }
     }
 
-    public Bush( Vector2 position){
-        super(position, true);
-        numberOfBerries = 1;
-        hasBerries = true;
+    @Override
+    public void interact(Player player){
+        if (numberOfBerries > 0) {
+            player.getInventory().insertFood(Food.FoodType.Berries);
+        }
+        numberOfBerries = 0;
     }
 
     public int getNumberOfBerries(){
@@ -26,10 +33,5 @@ public class Bush extends  StationaryObject{
         return hasBerries;
     }
 
-    public int gatherBerries(){
-        hasBerries = false;
-        int returnVal = numberOfBerries;
-        numberOfBerries = 0;
-        return returnVal;
-    }
+
 }

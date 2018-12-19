@@ -1,7 +1,9 @@
 
 package View;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -16,14 +18,18 @@ public class ViewManager {
         private Scene scene;
         private Stage stage;
 
+
         private GameViewManager gvm;
         private MiniMapViewManager mmvm;
         private InventoryViewManager ivm;
+        private SubScene combatPane;
         private Game game;
 
+        private boolean combatWindowSpawned;
 
         public ViewManager(Game game){
             this.game = game;
+            combatWindowSpawned = false;
             gvm = new GameViewManager(game);
             mmvm = new MiniMapViewManager(game);
             ivm = new InventoryViewManager(game);
@@ -41,13 +47,37 @@ public class ViewManager {
             stage = new Stage();
             stage.setScene(scene);
             stage.setTitle("S U R V I V E");
+            gameLoop();
         }
 
-
-        public Stage getStage(){
+    private void gameLoop(){
+        AnimationTimer animationTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if(!game.isGameOver()) {
+                    if (Game.isInCombat()) {
+                        if (!combatWindowSpawned) {
+                            combatWindowSpawned = true;
+                            combatPane = new CombatViewManager(game, Game.getCurrentEncounter(), stage.getScene()).getCombatCombatSubscene();
+                            bp.setCenter(combatPane);
+                        }
+                    } else {
+                        bp.setCenter(gvm.getSubscene());
+                        combatWindowSpawned = false;
+                        combatPane = null;
+                    }
+                }
+                else {
+                    bp.setCenter(new GameOverViewManager(game.isGameWon()));
+                }
+            }
+        };
+        animationTimer.start();
+    }
+    public Stage getStage(){
             return stage;
         }
-        public Scene getScene() {
+    public Scene getScene() {
             return scene;
-        }
+    }
 }
