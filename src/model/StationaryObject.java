@@ -1,22 +1,14 @@
 package model;
 
-abstract class StationaryObject extends GameObject{
+abstract public class StationaryObject extends GameObject implements Interactable{
+    //Determines whether animals may walk through/over object
     private boolean passable;
 
-    StationaryObject(){
-        super();
-        this.passable= true;
-    }
-    StationaryObject(Vector2 pos){
-        super(pos);
-        this.passable = true;
-    }
-    StationaryObject(boolean passable){
-        super();
-        this.passable = passable;
-    }
-    StationaryObject(Vector2 pos, boolean passable){
-        super(pos);
+    //Stationary Objects are a single step away from GameObject in the class hierarchy. They do not contain any
+    //methods which allow them to move, and contain only small bit of new information.  Whether or not they are
+    //passable by animal classes, and that they are guaranteed to implement Interactable
+    StationaryObject(Vector2 pos, Game game, boolean passable){
+        super(pos, game);
         this.passable = passable;
     }
 

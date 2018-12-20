@@ -1,7 +1,10 @@
 
 package View;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -16,14 +19,18 @@ public class ViewManager {
         private Scene scene;
         private Stage stage;
 
+
         private GameViewManager gvm;
         private MiniMapViewManager mmvm;
         private InventoryViewManager ivm;
+        private SubScene combatPane;
         private Game game;
 
+        private boolean combatWindowSpawned;
 
         public ViewManager(Game game){
             this.game = game;
+            combatWindowSpawned = false;
             gvm = new GameViewManager(game);
             mmvm = new MiniMapViewManager(game);
             ivm = new InventoryViewManager(game);
@@ -35,19 +42,53 @@ public class ViewManager {
             bp.setAlignment(gvm.getSubscene(), Pos.CENTER);
             bp.setAlignment(mmvm.getSubscene(), Pos.CENTER_RIGHT);
             bp.setAlignment(ivm.getSubscene(), Pos.CENTER_LEFT);
-
+            setUpRulesButton();
             bp.setPrefSize(1120,872);
             scene = new Scene(bp, WIDTH, HEIGHT, false);
             stage = new Stage();
             stage.setScene(scene);
             stage.setTitle("S U R V I V E");
+            gameLoop();
         }
 
+    private void gameLoop(){
+        AnimationTimer animationTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if(!game.isGameOver()) {
+                    if (game.isInCombat()) {
+                        if (!combatWindowSpawned) {
+                            combatWindowSpawned = true;
+                            combatPane = new CombatViewManager(game, game.getCurrentEncounter(), stage.getScene()).getCombatCombatSubscene();
+                            bp.setCenter(combatPane);
+                        }
+                    } else {
+                        bp.setCenter(gvm.getSubscene());
+                        combatWindowSpawned = false;
+                        combatPane = null;
+                    }
+                }
+                else {
+                    bp.setCenter(new GameOverViewManager(game.isGameWon()));
+                }
+            }
+        };
+        animationTimer.start();
+    }
 
-        public Stage getStage(){
+    private void setUpRulesButton(){
+        HBox hbox = new HBox();
+        Button rulesButton = new Button("Hide/Display Rules");
+        rulesButton.setOnAction(e -> gvm.displayRulesPane());
+        rulesButton.setFocusTraversable(false);
+        hbox.getChildren().add(rulesButton);
+        hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        bp.setTop(hbox);
+    }
+    public Stage getStage(){
             return stage;
         }
-        public Scene getScene() {
+    public Scene getScene() {
             return scene;
-        }
+    }
 }

@@ -12,7 +12,7 @@ public class Noise {
     public Noise(int GAME_MAP_X, int GAME_MAP_Y) {
         this.GAME_MAP_X = GAME_MAP_X;
         this.GAME_MAP_Y = GAME_MAP_Y;
-        grid = new Vector2[(int) Math.ceil(this.GAME_MAP_Y / 5)][(int) Math.ceil(this.GAME_MAP_X / 5)];
+        grid = new Vector2[(int) Math.ceil(this.GAME_MAP_Y / 5f)][(int) Math.ceil(this.GAME_MAP_X / 5f)];
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
                 grid[y][x] = new Vector2(true);

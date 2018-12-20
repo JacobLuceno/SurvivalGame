@@ -1,103 +1,54 @@
 package model;
 
 public class Map {
+
+    //private final game map parameters
     private final int GAME_BOARD_X;
     private final int GAME_BOARD_Y;
 
-    private Noise noise;
+    //The terrainMap contains references to the game's TerrainTiles.  These hold information about each grid space.
     private TerrainTile[][] terrainMap;
-    private float[][] terVal;
-    //TODO implement a minimap which utilizes the TerrainTiles' reaveledToPlayer attribute
 
-    public Map(int gameBoardX, int gameBoardY) {
-        this.GAME_BOARD_X = gameBoardX;
-        this.GAME_BOARD_Y = gameBoardY;
 
-        noise = new Noise(this.GAME_BOARD_X, this.GAME_BOARD_Y);
-        terVal = noise.getNoiseArray();
+    public Map(Game game) {
+        //Set final variables
+        this.GAME_BOARD_X = game.getWIDTH();
+        this.GAME_BOARD_Y = game.getHEIGHT();
+        //instantiate Perlin Noise generating object
+        Noise noise = new Noise(this.GAME_BOARD_X, this.GAME_BOARD_Y);
+        //get the Perlin Noise Array
+        float[][] terVal = noise.getNoiseArray();
+
+        //Initialize TerrainTiles
+        setUpTerrainMap(terVal, game);
+    }
+
+    //Calls the constructor for each TerrainTile in the array, passing in a unique Perlin Noise value to determine
+    //characteristics of tile.
+    private void setUpTerrainMap(float[][] terVal, Game game){
+        //Intializes the TerrainTile array to the size of the current game
         terrainMap = new TerrainTile[this.GAME_BOARD_Y][this.GAME_BOARD_X];
-        do { // This loop insures the game places the base, but currently heavily favors top few rows
-            for (int y = 0; y < this.GAME_BOARD_Y; y++) {
-                for (int x = 0; x < this.GAME_BOARD_X; x++) {
-                    terrainMap[y][x] = new TerrainTile(terVal[y][x], new Vector2(y, x));
-                }
-            }
-        } while (!TerrainTile.getBasePlaced());
-    }
 
-
-    //TODO Delete Test functions
-    public void printMap() {
-        for (TerrainTile[] y : terrainMap) {
-            for (TerrainTile x : y) {
-                switch (x.getTerrainType()) {
-                    case WATER:
-                        System.out.print("Water\t");
-                        break;
-                    case DESERT:
-                        if (x.getHasStatObj()) {
-                            switch (x.getStatObjType()) {
-                                case ROCK:
-                                    System.out.print("Rock\t");
-                                    break;
-                                case BUSH:
-                                    System.out.print("Bush\t");
-                                    break;
-                            }
-                        } else {
-                            System.out.print("Desert\t");
-                        }
-                        break;
-                    case GRASSLAND:
-                        if (x.getHasStatObj()) {
-                            switch (x.getStatObjType()) {
-                                case ROCK:
-                                    System.out.print("Rock\t");
-                                    break;
-                                case BUSH:
-                                    System.out.print("Bush\t");
-                                    break;
-                                case BASE:
-                                    System.out.print("Base\t");
-                                    break;
-                                case TREE:
-                                    System.out.print("Tree\t");
-                                    break;
-                            }
-                        } else {
-                            System.out.print("Grass\t");
-                        }
-                        break;
-                }
+        for (int y = 0; y < this.GAME_BOARD_Y; y++) {
+            for (int x = 0; x < this.GAME_BOARD_X; x++) {
+                //Each TerrainTile takes a perlin value to determine terrainType, holds on to a reference to its
+                //position in the grid, and sets a reference to the game to which it belongs
+                terrainMap[y][x] = new TerrainTile(terVal[y][x], new Vector2(y, x), game);
             }
-            System.out.println();
         }
     }
 
-    public void printTerrainTypes() {
-        for (TerrainTile[] y : terrainMap) {
-            for (TerrainTile x : y) {
-                System.out.print(x.toString());
-            }
-            System.out.println();
-        }
-    }
 
-    //getters and setters
+
+
+    //GETTERS AND SETTERS
     public TerrainTile[][] getTerrainMap() {
         return terrainMap;
     }
-
     public int getGAME_BOARD_X() {
         return GAME_BOARD_X;
     }
-
     public int getGAME_BOARD_Y() {
         return GAME_BOARD_Y;
     }
 }
-
-
-
-
-
