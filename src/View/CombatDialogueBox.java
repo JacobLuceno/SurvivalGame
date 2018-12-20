@@ -67,6 +67,7 @@ public class CombatDialogueBox extends Group {
         //mainPane.setMaxSize(MESSAGE_WIDTH, MESSAGE_HEIGHT);
         //mainPane.setMinSize(MESSAGE_WIDTH, MESSAGE_HEIGHT);
         Label curMessage = new Label(message);
+        curMessage.setFont(new Font(25));
         ImageView dialogueBoxBackground = new ImageView(DIALOGUE_BOX);
         mainPane.getChildren().addAll(dialogueBoxBackground,curMessage);
         this.getChildren().add(mainPane);

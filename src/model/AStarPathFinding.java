@@ -173,8 +173,6 @@ public class AStarPathFinding {
             }
         }
         if (openSet.size() <= 0) {
-            System.out.println("It's possible that there's no solution. Needs more testing to guarantee.");
-            System.out.println("Returning start vector...");
             setUpGrid(game,canWalk);
             path.add(start);
         }

@@ -23,6 +23,7 @@ public class ControlManager {
 
     private AnimationTimer animationTimer;
 
+    //tags to reset event handlers after combat changes them
     private boolean gameWasInCombat;
     private boolean resetListeners;
 
@@ -35,50 +36,7 @@ public class ControlManager {
         gameLoop();
     }
 
-    private void setUpListeners(){
-        scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.UP){
-                setUpKeyDown(true);
-            }
-            if (e.getCode() == KeyCode.DOWN){
-                setDownKeyDown(true);
-            }
-            if (e.getCode() == KeyCode.RIGHT){
-                setRightKeyDown(true);
-            }
-            if (e.getCode() == KeyCode.LEFT){
-                setLeftKeyDown(true);
-            }
-        });
-        scene.setOnKeyReleased(e -> {
-            if (e.getCode() == KeyCode.UP){
-                setUpKeyDown(false);
-            }
-            if (e.getCode() == KeyCode.DOWN){
-                setDownKeyDown(false);
-            }
-            if (e.getCode() == KeyCode.RIGHT){
-                setRightKeyDown(false);
-            }
-            if (e.getCode() == KeyCode.LEFT){
-                setLeftKeyDown(false);
-            }
-            if (e.getCode() == KeyCode.R){
-                game.getPlayer().AttemptRest();
-            }
-            if (e.getCode() == KeyCode.B){
-                if (game.getPlayer().checkForBase()){
-                    game.getBase().buyNewBaseUpgrade(game.getPlayer());
-                }
-            }
-            if (e.getCode() == KeyCode.T){
-                if (game.getPlayer().checkForBase()){
-                    game.getBase().buyNewToolUpgrade(game.getPlayer());
-                }
-            }
-        });
-    }
-
+    //The game loop itself
     private void gameLoop(){
         animationTimer = new AnimationTimer() {
             @Override
@@ -98,6 +56,8 @@ public class ControlManager {
         animationTimer.start();
     }
 
+    //This loop monitors key presses, checks for animals to despawn, and set's nonbusy animals to wander
+    //it also checks the game for win/lose conditions
     private void update(){
         if(!game.getPlayer().isBusy() && !game.isInCombat()) {
             if (gameWasInCombat){
@@ -150,6 +110,7 @@ public class ControlManager {
         }
     }
 
+    //this function returns the player's targetPosition based on their facing
     private TerrainTile targetPos(){
         Player player = game.getPlayer();
         try {
@@ -170,6 +131,7 @@ public class ControlManager {
         }
     }
 
+    //This function reveals newly seen tiles on the minimap
     private void revealMiniMap(Game.Direction facing){
         switch(facing){
             case UP:
@@ -213,6 +175,51 @@ public class ControlManager {
                 }
                 break;
         }
+    }
+
+    //Sets up event handlers for key presses
+    private void setUpListeners(){
+        scene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.UP){
+                setUpKeyDown(true);
+            }
+            if (e.getCode() == KeyCode.DOWN){
+                setDownKeyDown(true);
+            }
+            if (e.getCode() == KeyCode.RIGHT){
+                setRightKeyDown(true);
+            }
+            if (e.getCode() == KeyCode.LEFT){
+                setLeftKeyDown(true);
+            }
+        });
+        scene.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.UP){
+                setUpKeyDown(false);
+            }
+            if (e.getCode() == KeyCode.DOWN){
+                setDownKeyDown(false);
+            }
+            if (e.getCode() == KeyCode.RIGHT){
+                setRightKeyDown(false);
+            }
+            if (e.getCode() == KeyCode.LEFT){
+                setLeftKeyDown(false);
+            }
+            if (e.getCode() == KeyCode.R){
+                game.getPlayer().AttemptRest();
+            }
+            if (e.getCode() == KeyCode.B){
+                if (game.getPlayer().checkForBase()){
+                    game.getBase().buyNewBaseUpgrade(game.getPlayer());
+                }
+            }
+            if (e.getCode() == KeyCode.T){
+                if (game.getPlayer().checkForBase()){
+                    game.getBase().buyNewToolUpgrade(game.getPlayer());
+                }
+            }
+        });
     }
 
     //Getters and Setters

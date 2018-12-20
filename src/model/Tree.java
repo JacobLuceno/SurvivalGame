@@ -28,7 +28,6 @@ public class Tree extends StationaryObject implements iRestable {
     @Override
     public void interact(Player player){
         player.gatherSticks(harvestSticks());
-        System.out.println(player.getSticks());
     }
     //implements the iRestable interface
     @Override

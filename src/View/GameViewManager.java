@@ -42,6 +42,7 @@ public class GameViewManager {
     private static final Image [] UPGRADED_BASE_IMAGES = new Image[] {new Image("View/Resources/shack.png"),
                                                                         new Image("View/Resources/house.png"),
                                                                         new Image ("View/Resources/fort.png")};
+    private static final Image RULES_PANE = new Image("View/Resources/rules_pane.png");
     private AnimationTimer animationTimer;
 
     private Game game;
@@ -64,11 +65,13 @@ public class GameViewManager {
 
     private boolean dayMode;
     private ImageView[][] removableSprites;
+    private ImageView rules;
 
     private Label restPrompt;
     private Label upgradePrompt;
     private boolean restPromptDisplayed;
     private boolean upgradePromptDisplayed;
+    private boolean rulesPaneDisplayed;
 
     private int curAnimalListSize;
 
@@ -79,6 +82,7 @@ public class GameViewManager {
         curAnimalListSize = 0;
         removableSprites = new ImageView[game.getHEIGHT()][game.getWIDTH()];
         playerImage = new ImageView(PLAYER_IMAGE);
+        rules = new ImageView(RULES_PANE);
         animalImages = new ArrayList<>();
         rockPane = new Pane();
         terrainGrid = setUpTerrainGridPane();
@@ -100,6 +104,7 @@ public class GameViewManager {
 
     }
 
+    //Main UI Game Loop, updated 60x/ second
     private void gameLoop(){
         animationTimer = new AnimationTimer() {
             @Override
@@ -143,6 +148,7 @@ public class GameViewManager {
         animationTimer.start();
     }
 
+    //Initialization functions to set up the game Pane
     private void setUpCamera(){
         camera = new ParallelCamera();
         camera.setNearClip(0.1);
@@ -170,13 +176,11 @@ public class GameViewManager {
                         gp.add(iv, x, y);
                         break;
                     default:
-                        System.out.println("not detecting terrain type");
                 }
             }
         }
         return gp;
     }
-
     private Pane setUpStatObjGridPane(){
         Map map = game.getMap();
         Pane gp = new Pane();
@@ -237,7 +241,6 @@ public class GameViewManager {
                             gp.getChildren().add(obj);
                             break;
                         default:
-                            System.out.println("not detecting terrain type");
                     }
                 }
             }
@@ -256,6 +259,7 @@ public class GameViewManager {
        return region;
     }
 
+    //Used to spawn in a new animal sprite
     private void spawnNewAnimal(){
         AnimalImageView animal = new AnimalImageView(game.getAnimals().get(game.getAnimals().size() - 1).getGameImage(), game.getAnimals().get(game.getAnimals().size() - 1));
         animal.setTranslateX(game.getAnimals().get(game.getAnimals().size() - 1).getPosition().getv1()*GAMETILE_WIDTH);
@@ -264,7 +268,23 @@ public class GameViewManager {
         animalPane.getChildren().add(animal);
         animalImages.add(animal);
     }
+    //Replaces the image of the base on the gameView when the base is upgraded
+    public void replaceBaseImage(){
+        if (game.getBase().isBeenUpgraded()) {
+            game.getBase().setBeenUpgraded(false);
+            Vector2 basePos = game.getBase().getPosition();
+            int x = (int)basePos.getv1();
+            int y = (int)basePos.getv0();
+            statObjPane.getChildren().remove(removableSprites[y][x]);
+            ImageView replacement = new ImageView (UPGRADED_BASE_IMAGES[game.getBase().getBaseStatus().ordinal()-1]);
+            removableSprites[y][x] = replacement;
+            replacement.setTranslateX(x * GAMETILE_WIDTH);
+            replacement.setTranslateY(y * GAMETILE_WIDTH);
+            statObjPane.getChildren().add(replacement);
+        }
+    }
 
+    //Update functions for positions and attaching/detaching certain panes
     private void updateCameraPosition(){
             camera.setTranslateX(playerImage.getTranslateX() - 320);
             camera.setTranslateY(playerImage.getTranslateY() - 320);
@@ -281,7 +301,6 @@ public class GameViewManager {
                 animalWalkingAnimation(aiv);
         }
     }
-
     private void updateDayCycle(){
         if (dayMode != game.isDayTime()){
             dayMode = game.isDayTime();
@@ -304,12 +323,12 @@ public class GameViewManager {
             }
         }
     }
-
     private void updateNightShiftLocation(){
         nightShiftPane.setTranslateX(playerImage.getTranslateX() - 250);
         nightShiftPane.setTranslateY(playerImage.getTranslateY() - 245);
     }
 
+    //Displays labels for upgrading and resting
     private void displayPrompts(){
         Player player = game.getPlayer();
         if (player.isDisplayUpgradesPrompt()){
@@ -347,13 +366,28 @@ public class GameViewManager {
 
     }
 
+    //Displays the rules Pane
+    public void displayRulesPane(){
+        if (!rulesPaneDisplayed){
+            rulesPaneDisplayed = true;
+            game.getPlayer().setBusy(true);
+            rules.setTranslateX(camera.getTranslateX());
+            rules.setTranslateY(camera.getTranslateY());
+            group.getChildren().add(rules);
+        } else{
+            rulesPaneDisplayed = false;
+            game.getPlayer().setBusy(false);
+            group.getChildren().remove(rules);
+        }
+    }
+
+    //Animations defined by the Transition JavaFX classes
     private void nightShiftEndAnimation(){
         st = new ScaleTransition(Duration.millis(1000), nightClippingPlane);
         st.setToX(10f);
         st.setToY(10f);
         st.setAutoReverse(false);
     }
-
     private void nightShiftStartAnimation(){
         nightClippingPlane = new Circle(playerImage.getLayoutX() + 336,playerImage.getLayoutY() + 336,1500);
         st = new ScaleTransition(Duration.millis(750), nightClippingPlane);
@@ -361,7 +395,6 @@ public class GameViewManager {
         st.setToY(1/10f);
         st.setAutoReverse(false);
     }
-
     private void walkingAnimation(){
         TranslateTransition tt = new TranslateTransition(new Duration(300),playerImage);
         tt.setToX(game.getPlayer().getPosition().getv1()*GAMETILE_WIDTH);
@@ -373,7 +406,6 @@ public class GameViewManager {
             game.getPlayer().setBusy(false);
         });
     }
-
     private void animalWalkingAnimation(AnimalImageView aiv){
             if (!aiv.isAnimationTriggered()){
                 aiv.setAnimationTriggered(true);
@@ -387,7 +419,6 @@ public class GameViewManager {
                 });
             }
     }
-
     private void restingAnimation(){
         boolean nextComesNight;
         game.getPlayer().setResting(false);
@@ -417,7 +448,6 @@ public class GameViewManager {
             st.setOnFinished(e-> {
                 ScaleTransition st2 = new ScaleTransition(Duration.millis(750), restingClippingPlane);
                 st2.setAutoReverse(false);
-                System.out.println("Shrinking animation finished");
                 if (!nextComesNight) {
                     st2.setToX(10f);
                     st2.setToY(10f);
@@ -448,7 +478,6 @@ public class GameViewManager {
             st.play();
         }
     }
-
     private void harvestingAnimation(){
         TranslateTransition tt = new TranslateTransition(new Duration(150),playerImage);
         final ImageView treeToReplace;
@@ -520,20 +549,6 @@ public class GameViewManager {
         });
     }
 
-    public void replaceBaseImage(){
-        if (game.getBase().isBeenUpgraded()) {
-            game.getBase().setBeenUpgraded(false);
-            Vector2 basePos = game.getBase().getPosition();
-            int x = (int)basePos.getv1();
-            int y = (int)basePos.getv0();
-            statObjPane.getChildren().remove(removableSprites[y][x]);
-            ImageView replacement = new ImageView (UPGRADED_BASE_IMAGES[game.getBase().getBaseStatus().ordinal()-1]);
-            removableSprites[y][x] = replacement;
-            replacement.setTranslateX(x * GAMETILE_WIDTH);
-            replacement.setTranslateY(y * GAMETILE_WIDTH);
-            statObjPane.getChildren().add(replacement);
-        }
-    }
 
     public SubScene getSubscene() {
         return subscene;

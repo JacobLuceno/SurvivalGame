@@ -114,7 +114,6 @@ public class Player extends MobileObject{
     }
     @Override
     public boolean attack(MobileObject target){
-        System.out.println("Player attacks");
         Random rand = new Random();
         boolean successful = rand.nextBoolean();
         if (successful){

@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -41,7 +42,7 @@ public class ViewManager {
             bp.setAlignment(gvm.getSubscene(), Pos.CENTER);
             bp.setAlignment(mmvm.getSubscene(), Pos.CENTER_RIGHT);
             bp.setAlignment(ivm.getSubscene(), Pos.CENTER_LEFT);
-
+            setUpRulesButton();
             bp.setPrefSize(1120,872);
             scene = new Scene(bp, WIDTH, HEIGHT, false);
             stage = new Stage();
@@ -73,6 +74,16 @@ public class ViewManager {
             }
         };
         animationTimer.start();
+    }
+
+    private void setUpRulesButton(){
+        HBox hbox = new HBox();
+        Button rulesButton = new Button("Hide/Display Rules");
+        rulesButton.setOnAction(e -> gvm.displayRulesPane());
+        rulesButton.setFocusTraversable(false);
+        hbox.getChildren().add(rulesButton);
+        hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        bp.setTop(hbox);
     }
     public Stage getStage(){
             return stage;

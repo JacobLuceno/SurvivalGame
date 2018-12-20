@@ -7,6 +7,7 @@ import javafx.scene.SubScene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.Carnivore;
@@ -33,6 +34,9 @@ public class CombatViewManager {
     private CombatDialogueBox cdb;
     private Scene parentScene;
 
+    private int curEnemyHP;
+    private Label enemyLabel;
+
     public CombatViewManager(Game game, CombatEncounter combatEncounter, Scene parentScene){
         buttons = new ArrayList<>();
         combatEncounter.setGame(game);
@@ -45,7 +49,6 @@ public class CombatViewManager {
         setUpCombatUI();
         cdb = null;
         subscene = new SubScene(group,WIDTH,HEIGHT);
-        System.out.println("CVM spawned");
         gameLoop();
     }
 
@@ -96,9 +99,13 @@ public class CombatViewManager {
         flightButton.setLayoutX(WIDTH - 100);
         flightButton.setLayoutY(3f/4f*HEIGHT);
 
+        enemyLabel = new Label("Enemy HP:\t" + combatEncounter.getAnimal().getCurrentHitPoints() + " / "
+                                + combatEncounter.getAnimal().getMAX_HIT_POINTS());
+        enemyLabel.setLayoutX(300);
+        enemyLabel.setLayoutY(30);
+        curEnemyHP = combatEncounter.getAnimal().getCurrentHitPoints();
 
-
-        group = new Group(combatUIPane,combatCanvas, fightButton, flightButton, combatPortrait);
+        group = new Group(combatUIPane,combatCanvas, fightButton, flightButton, combatPortrait, enemyLabel);
 
     }
     private void gameLoop(){
@@ -130,9 +137,18 @@ public class CombatViewManager {
                         }
                     }
                 }
+                updateEnemyLabel();
             }
         };
         animationTimer.start();
+    }
+
+    private void updateEnemyLabel(){
+        if (curEnemyHP != combatEncounter.getAnimal().getCurrentHitPoints()){
+            curEnemyHP = combatEncounter.getAnimal().getCurrentHitPoints();
+            enemyLabel.setText("Enemy HP:\t" + combatEncounter.getAnimal().getCurrentHitPoints() + " / "
+                    + combatEncounter.getAnimal().getMAX_HIT_POINTS());
+        }
     }
 
 
